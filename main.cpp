@@ -6,6 +6,8 @@
 using u8 = unsigned char;
 using u32 = unsigned int;
 
+#define PI 3.14159265
+
 class Fft {
 private:
     std::vector<std::complex<double>> m_twiddles;
@@ -56,7 +58,7 @@ public:
         size_t fft_size = (end - start) + 1;
         for (size_t k = 0, m = start; k < fft_size / 2; k++, m++) {
             auto out1 = samples[m] + (twiddle (fft_size, k) * samples[m + fft_size / 2]);
-            auto out2 = samples[m + fft_size / 2] + (twiddle (fft_size, k + (fft_size / 2)) * samples[m]);
+            auto out2 = samples[m] + (twiddle (fft_size, k + (fft_size / 2)) * samples[m + (fft_size / 2)]);
             samples[m] = out1;
             samples[m + (fft_size / 2)] = out2;
         }
@@ -78,13 +80,11 @@ public:
         size_t size = -(2 * ((1 - pow (2, log2 (fft_size)))));
         m_twiddles.reserve (size);
 
-        // Can we just set 1 and -1 for all size DFTs? Even those which are not exactly 2?
-        // Don't think so. FIXME.
         m_twiddles.emplace_back(1, 0);
         m_twiddles.emplace_back(-1, 0);
         for (size_t m = 4; m <= fft_size; m *= 2) {
             for (size_t i = 0; i < m; i++) {
-                std::complex<double> exponent = {0, (-2 * M_PI * i) / m};
+                std::complex<double> exponent = {0, (-2 * PI * i) / m};
                 auto tmp = exp(exponent);
                 if (fabs(tmp.real()) < 1e-10)
                     tmp = {0, tmp.imag()};
@@ -104,9 +104,9 @@ public:
     {
         for (auto& sample : m_samples)
         {
-            if (fabs(sample.real()) < 1e-10)
+            if (fabs(sample.real()) < 1e-5)
                 sample = {0, sample.imag()};
-            if (fabs(sample.imag()) < 1e-10)
+            if (fabs(sample.imag()) < 1e-5)
                 sample = {sample.real(), 0};
         }
     }
