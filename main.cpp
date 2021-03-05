@@ -79,16 +79,15 @@ public:
     void compute_twiddles (size_t fft_size) {
         size_t size = -(2 * ((1 - pow (2, log2 (fft_size)))));
         m_twiddles.reserve (size);
-
         m_twiddles.emplace_back(1, 0);
         m_twiddles.emplace_back(-1, 0);
         for (size_t m = 4; m <= fft_size; m *= 2) {
             for (size_t i = 0; i < m; i++) {
                 std::complex<double> exponent = {0, (-2 * PI * i) / m};
                 auto tmp = exp(exponent);
-                if (fabs(tmp.real()) < 1e-10)
+                if (fabs(tmp.real()) < 1e-6)
                     tmp = {0, tmp.imag()};
-                if (fabs(tmp.imag()) < 1e-10)
+                if (fabs(tmp.imag()) < 1e-6)
                     tmp = {tmp.real(), 0};
                 m_twiddles.emplace_back(tmp);
             }
@@ -104,9 +103,9 @@ public:
     {
         for (auto& sample : m_samples)
         {
-            if (fabs(sample.real()) < 1e-5)
+            if (fabs(sample.real()) < 1e-4)
                 sample = {0, sample.imag()};
-            if (fabs(sample.imag()) < 1e-5)
+            if (fabs(sample.imag()) < 1e-4)
                 sample = {sample.real(), 0};
         }
     }
