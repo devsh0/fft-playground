@@ -1,9 +1,10 @@
 #include "fftw.h"
 #include "myfft.h"
+#include "signalgen.h"
 #include <iostream>
 
-using fft_type = std::vector<std::complex<double>>;
-bool is_close (const fft_type& out1, const fft_type &out2, double tolerance) {
+using fftout_t = std::vector<std::complex<double>>;
+bool is_close (const fftout_t& out1, const fftout_t& out2, double tolerance) {
     if (out1.size () != out2.size ()) {
         std::cout << "Varying sizes: "
                   << "out1: " << out1.size () << ", out2: " << out2.size () << "\n";
@@ -22,11 +23,11 @@ bool is_close (const fft_type& out1, const fft_type &out2, double tolerance) {
         auto imag_diff = fabs (out1_imag - out2_imag);
 
         if (real_diff > tolerance) {
-            std::cout << "Tolerance: " << tolerance << ", real_diff: " << real_diff;
+            std::cout << "Index: " << i << ", Tolerance: " << tolerance << ", real_diff: " << real_diff << "\n";
             okay = false;
         }
         if (imag_diff > tolerance) {
-            std::cout << "Tolerance: " << tolerance << ", imag_diff: " << imag_diff;
+            std::cout << "Index: " << i << ", Tolerance: " << tolerance << ", imag_diff: " << imag_diff << "\n";
             okay = false;
         }
     }
@@ -34,16 +35,34 @@ bool is_close (const fft_type& out1, const fft_type &out2, double tolerance) {
     return okay;
 }
 
+void dump_fftout_side_by_side (const fftout_t& out1, const fftout_t& out2) {
+    if (out1.size () != out2.size ())
+        std::cerr << "Whoops! Sizes don't seem to match up!\n";
+    for (size_t i = 0; i < out1.size (); i++) {
+        std::cout << "[i: " << i << ", out1: {" << out1[i].real () << ", " << out1[i].imag () << "}, "
+                  << "out2: {" << out2[i].real () << ", " << out2[i].imag () << "}]\n";
+    }
+}
+
 int main () {
-    std::vector<double> samples = {0.3535, 0.3535, 0.6464, 1.0607, 0.3535, -1.0607, -1.3535, -0.3535};
-    MyFFT myfft;
-    FFTW fftw;
+    for (size_t i = 1; i < 4; i++) {
+        size_t size = 2u << i;
+        //std::cout << "Size: " << size << "\n";
+        const std::vector<double> samples = generate (size);
+        MyFFT myfft;
+        FFTW fftw;
 
-    auto out1 = myfft.transform (samples);
-    auto out2 = fftw.transform(samples);
-    double tolerance = 0.01;
-    std::cout << "Is Close: " << is_close(out1, out2, tolerance);
+        auto out1 = myfft.transform (samples);
+        auto out2 = fftw.transform (samples);
+        double tolerance = 0.0001;
 
+        bool close = is_close (out1, out2, tolerance);
+        if (close)
+            std::cout << "Size: " << size << " -- FFTs Match :)\n";
+        else
+            std::cout << "Size: " << size << " -- FFTs Don't Match :(\n";
+        //dump_fftout_side_by_side (out1, out2);
+    }
 
     return 0;
 }

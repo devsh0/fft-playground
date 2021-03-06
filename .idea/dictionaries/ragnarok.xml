@@ -2,6 +2,7 @@
   <dictionary name="ragnarok">
     <words>
       <w>bitpair</w>
+      <w>fftout</w>
       <w>fftw</w>
       <w>lbit</w>
       <w>myfft</w>

@@ -1,6 +1,7 @@
 #include "myfft.h"
 #include <cmath>
 #include <complex>
+#include <iostream>
 #include <vector>
 
 using u8 = unsigned char;
@@ -8,15 +9,15 @@ using u32 = unsigned int;
 
 #define PI 3.14159265
 
-size_t MyFFT::get_complement (unsigned number, int size) {
+size_t MyFFT::get_complement (size_t number, size_t width) {
     // Unpack bits
     std::vector<u8> bits;
-    bits.reserve (size);
-    for (unsigned i = 0; i < size; i++)
+    bits.reserve (width);
+    for (size_t i = 0; i < width; i++)
         bits.push_back ((number & (1u << i)) > 0);
 
     // Reverse bits
-    for (int i = 0, j = size - 1; i != j; i++, j--) {
+    for (size_t i = 0, j = width - 1; i < j; i++, j--) {
         u8 tmp = bits.at (i);
         bits[i] = bits[j];
         bits[j] = tmp;
@@ -24,7 +25,7 @@ size_t MyFFT::get_complement (unsigned number, int size) {
 
     // Compute "complement"
     size_t accum = 0;
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < width; i++)
         accum += bits[i] * (pow (2, i));
     return accum;
 }
@@ -32,6 +33,7 @@ size_t MyFFT::get_complement (unsigned number, int size) {
 void MyFFT::bit_reversal (std::vector<double>& samples) {
     // TODO: check if sample vector size is a power of 2.
     int size = samples.size ();
+    //m_bit_reverse_index.reserve(size);
     int bit_space = (int) log2 (size);
     for (int i = 1; i < size / 2; i++) {
         int complement_i = get_complement (i, bit_space);
@@ -78,10 +80,10 @@ void MyFFT::compute_twiddles (size_t fft_size) {
         for (size_t i = 0; i < m; i++) {
             std::complex<double> exponent = {0, (-2 * PI * i) / m};
             auto tmp = exp (exponent);
-            if (fabs (tmp.real ()) < 1e-6)
+            /*if (fabs (tmp.real ()) < 1e-6)
                 tmp = {0, tmp.imag ()};
             if (fabs (tmp.imag ()) < 1e-6)
-                tmp = {tmp.real (), 0};
+                tmp = {tmp.real (), 0};*/
             m_twiddles.emplace_back (tmp);
         }
     }
@@ -110,6 +112,6 @@ std::vector<std::complex<double>> MyFFT::transform (const std::vector<double>& s
     for (double sample : samples_copy)
         m_samples.emplace_back (sample, 0);
     fft (m_samples, 0, samples.size () - 1);
-    reduce_noise ();
+    //reduce_noise ();
     return m_samples;
 }
