@@ -3,4 +3,5 @@ project(fft)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(fft main.cpp)
+add_executable(fft main.cpp myfft.cpp fftw.cpp signal.cpp)
+target_link_libraries(fft -lfftw3 -lm)

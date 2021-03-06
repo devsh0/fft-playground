@@ -2,7 +2,9 @@
   <dictionary name="ragnarok">
     <words>
       <w>bitpair</w>
+      <w>fftw</w>
       <w>lbit</w>
+      <w>myfft</w>
       <w>rbit</w>
       <w>synth</w>
     </words>
