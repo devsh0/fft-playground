@@ -47,12 +47,11 @@ void dump_fftout_side_by_side (const fftout_t& out1, const fftout_t& out2) {
 
 int main () {
     size_t start = 1;
-    size_t steps = 17;
+    size_t steps = 16;
     size_t stop = start + steps;
 
     for (size_t i = start; i < stop; i++) {
         size_t size = 2u << i;
-        //std::cout << "Size: " << size << "\n";
         const std::vector<double> samples = generate (size);
 
         MyFFT myfft;
@@ -60,14 +59,14 @@ int main () {
 
         auto out1 = myfft.transform (samples);
         auto out2 = fftw.transform (samples);
-        double tolerance = 0.005;
+        double tolerance = 0.1;
         //dump_fftout_side_by_side (out1, out2);
 
         bool close = is_close (out1, out2, tolerance);
         if (close)
-            std::cout << "Size: " << size << " -- FFTs Match :)\n";
+            std::cout << "Size: " << size << " -- FFTs Match :)\n\n";
         else
-            std::cout << "Size: " << size << " -- FFTs Don't Match :(\n";
+            std::cout << "Size: " << size << " -- FFTs Don't Match :(\n\n";
         //dump_fftout_side_by_side (out1, out2);
     }
     return 0;
