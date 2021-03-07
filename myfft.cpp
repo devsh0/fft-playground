@@ -1,8 +1,6 @@
 #include "myfft.h"
-#include <bitset>
 #include <cmath>
 #include <complex>
-#include <iostream>
 #include <vector>
 
 using u8 = unsigned char;
@@ -16,25 +14,17 @@ size_t MyFFT::get_complement (size_t number, size_t width) {
    u8 lstart = 0;
    for (int i = 0; i < width; i++)
    {
-       // test number's bit at rstart
-       // set complement's lstart bit to the tested bit
        u8 bit = ((1u << rstart) & number) > 0u;
        complement |= bit << lstart;
        rstart--;
        lstart++;
    }
-
-    /*std::bitset<4> ibits (number);
-    std::bitset<4> cbits (complement);
-    std::cout << ibits << "(" << number << ")" <<  ", " << cbits << "(" << complement << ")" << "\n";*/
-
    return complement;
 }
 
 void MyFFT::bit_reversal (std::vector<double>& samples) {
     // TODO: check if sample vector size is a power of 2.
     int size = samples.size ();
-    //std::cout << "Bit reversal---------------------------------\n";
     m_bit_reverse_index.reserve(size);
     int bit_space = (int) log2 (size);
     for (int i = 0; i < size; i++) {
@@ -51,17 +41,6 @@ void MyFFT::bit_reversal (std::vector<double>& samples) {
             samples[complement] = tmp;
         }
     }
-
-    /*for (int i = 0; i < size; i++)
-    {
-        unsigned complement_i = m_bit_reverse_index[i];
-        std::bitset<4> ibits (i);
-        std::bitset<4> cbits (complement_i);
-
-        std::cout << ibits << "(" << i << ")" <<  ", " << cbits << "(" << complement_i << ")" << "\n";
-    }*/
-
-    //std::cout << "---------------------------------\n";
 }
 
 std::complex<double> MyFFT::twiddle (size_t fft_size, size_t k) {
@@ -101,38 +80,18 @@ void MyFFT::compute_twiddles (size_t fft_size) {
         for (size_t i = 0; i < m; i++) {
             std::complex<double> exponent = {0, (-2 * PI * i) / m};
             auto tmp = exp (exponent);
-            /*if (fabs (tmp.real ()) < 1e-6)
-                tmp = {0, tmp.imag ()};
-            if (fabs (tmp.imag ()) < 1e-6)
-                tmp = {tmp.real (), 0};*/
             m_twiddles.emplace_back (tmp);
         }
-    }
-
-    /*std::cout << "\n----------------------------------------\n";
-        for (size_t i = 0; i < m_twiddles.size(); i++)
-            std::cout << "twiddle[" << i << "] = " << m_twiddles.at(i) << "\n";
-        std::cout << "\n----------------------------------------\n";*/
-}
-
-void MyFFT::reduce_noise () {
-    for (auto& sample : m_samples) {
-        if (fabs (sample.real ()) < 1e-4)
-            sample = {0, sample.imag ()};
-        if (fabs (sample.imag ()) < 1e-4)
-            sample = {sample.real (), 0};
     }
 }
 
 std::vector<std::complex<double>> MyFFT::transform (const std::vector<double>& samples) {
     compute_twiddles (samples.size ());
-    // I hope this does an element-by-element copy.
     std::vector<double> samples_copy {samples};
     bit_reversal (samples_copy);
     m_samples.reserve (samples.size ());
     for (double sample : samples_copy)
         m_samples.emplace_back (sample, 0);
     fft (m_samples, 0, samples.size () - 1);
-    //reduce_noise ();
     return m_samples;
 }

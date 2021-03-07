@@ -24,37 +24,18 @@ int range_rand (int min, int max)
 
 std::vector<double> generate_samples (size_t size)
 {
-    double amplitude = range_rand(1, 10);
-    double frequency = range_rand(1, 25000);
-    double sample_rate = range_rand(2, 4) * frequency;
-    double sample_interval = 1 / sample_rate;
-
     std::vector<double> samples;
     samples.reserve(size);
-    for (size_t i = 0; i < size; i++) {
-        double arg = frequency * (2 * M_PI) * (i * sample_interval);
-        samples.emplace_back (amplitude * sin(arg));
+    double scale = range_rand(1, 100);
+    for (size_t i = 0; i < size; i++)
+    {
+        double numer = range_rand(1, 1000);
+        double denom = range_rand(100, 2000);
+        int sign = (range_rand(1, 4) > 2) ? 1 : -1;
+        double sample = scale * sign * (numer / denom);
+        samples.emplace_back(sample);
     }
-
-    amplitude = range_rand(1, 10);
-    frequency = range_rand(1, 25000);
-    for (size_t i = 0; i < size; i++) {
-        double arg = frequency * (2 * M_PI) * (i * sample_interval);
-        samples[i] += (amplitude * cos(arg));
-    }
-
     return samples;
-}
-
-void test_samples_not_zero(const std::vector<double>& samples)
-{
-    double tol = 0.01;
-    double accum = 0;
-    for (double sample : samples)
-        accum += sample;
-    if (accum < tol)
-        std::cout << "It's all zero!\n";
-    else std::cout << "Input okay!\n";
 }
 
 std::vector<double> generate (size_t size)
@@ -64,14 +45,6 @@ std::vector<double> generate (size_t size)
         seed();
         seeded = true;
     }
-
-    std::vector<double> super(size, 0);
-
-    for (size_t i = 0; i < 10; i++) {
-        auto tmp = generate_samples (size);
-        for (size_t m = 0; m < size; m++)
-            super[m] += tmp[m];
-    }
-    test_samples_not_zero(super);
-    return super;
+    auto samples = generate_samples(size);
+    return samples;
 }

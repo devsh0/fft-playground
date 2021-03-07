@@ -4,6 +4,7 @@
 #include <iostream>
 
 using fftout_t = std::vector<std::complex<double>>;
+
 bool is_close (const fftout_t& out1, const fftout_t& out2, double tolerance) {
     if (out1.size () != out2.size ()) {
         std::cout << "Varying sizes: "
@@ -13,11 +14,11 @@ bool is_close (const fftout_t& out1, const fftout_t& out2, double tolerance) {
 
     size_t errors = 0;
     for (size_t i = 0; i < out1.size (); i++) {
-        auto out1_real = out1[i].real ();
-        auto out1_imag = out1[i].imag ();
+        auto out1_real = fabs(out1[i].real ());
+        auto out1_imag = fabs(out1[i].imag ());
 
-        auto out2_real = out2[i].real ();
-        auto out2_imag = out2[i].imag ();
+        auto out2_real = fabs(out2[i].real ());
+        auto out2_imag = fabs(out2[i].imag ());
 
         auto real_diff = fabs (out1_real - out2_real);
         auto imag_diff = fabs (out1_imag - out2_imag);
@@ -45,9 +46,10 @@ void dump_fftout_side_by_side (const fftout_t& out1, const fftout_t& out2) {
     }
 }
 
-int main () {
+void test_fft ()
+{
     size_t start = 1;
-    size_t steps = 16;
+    size_t steps = 15;
     size_t stop = start + steps;
 
     for (size_t i = start; i < stop; i++) {
@@ -59,7 +61,7 @@ int main () {
 
         auto out1 = myfft.transform (samples);
         auto out2 = fftw.transform (samples);
-        double tolerance = 0.1;
+        double tolerance = 0.005;
         //dump_fftout_side_by_side (out1, out2);
 
         bool close = is_close (out1, out2, tolerance);
@@ -67,7 +69,17 @@ int main () {
             std::cout << "Size: " << size << " -- FFTs Match :)\n\n";
         else
             std::cout << "Size: " << size << " -- FFTs Don't Match :(\n\n";
-        //dump_fftout_side_by_side (out1, out2);
     }
+}
+
+int main () {
+    int tests = 10;
+    for (int i = 0; i < tests; i++)
+    {
+        std::cout << "----------------- TEST " << i + 1 << " -----------------\n";
+        test_fft();
+        std::cout << "------------------------------------------\n";
+    }
+
     return 0;
 }
