@@ -1,4 +1,5 @@
 #include "myfft.h"
+#include <bitset>
 #include <cmath>
 #include <complex>
 #include <iostream>
@@ -33,14 +34,31 @@ size_t MyFFT::get_complement (size_t number, size_t width) {
 void MyFFT::bit_reversal (std::vector<double>& samples) {
     // TODO: check if sample vector size is a power of 2.
     int size = samples.size ();
+    std::cout << "Bit reversal---------------------------------\n";
     //m_bit_reverse_index.reserve(size);
     int bit_space = (int) log2 (size);
-    for (int i = 1; i < size / 2; i++) {
+    for (int i = 0; i < size / 2; i++) {
         int complement_i = get_complement (i, bit_space);
+
+        std::bitset<4> ibits (i);
+        std::bitset<4> cbits (complement_i);
+
+        std::cout << ibits << "(" << i << ")" <<  ", " << cbits << "(" << complement_i << ")" << "\n";
+        
         auto tmp = samples[i];
         samples[i] = samples[complement_i];
         samples[complement_i] = tmp;
+        //m_bit_reverse_index.emplace_back(complement_i);
     }
+
+    std::cout << "---------------------------------\n";
+
+    /*for (size_t i = 0; i < size; i++)
+    {
+        double tmp = samples[i];
+        samples[i] = samples[m_bit_reverse_index[i]];
+        samples[m_bit_reverse_index[i]] = tmp;
+    }*/
 }
 
 std::complex<double> MyFFT::twiddle (size_t fft_size, size_t k) {
@@ -52,7 +70,7 @@ std::complex<double> MyFFT::twiddle (size_t fft_size, size_t k) {
 void MyFFT::synth (std::vector<std::complex<double>>& samples, size_t start, size_t end) {
     size_t fft_size = (end - start) + 1;
     for (size_t k = 0, m = start; k < fft_size / 2; k++, m++) {
-        auto out1 = samples[m] + (twiddle (fft_size, k) * samples[m + fft_size / 2]);
+        auto out1 = samples[m] + (twiddle (fft_size, k) * samples[m + (fft_size / 2)]);
         auto out2 = samples[m] + (twiddle (fft_size, k + (fft_size / 2)) * samples[m + (fft_size / 2)]);
         samples[m] = out1;
         samples[m + (fft_size / 2)] = out2;
@@ -88,10 +106,10 @@ void MyFFT::compute_twiddles (size_t fft_size) {
         }
     }
 
-    /*std::cout << "\n----------------------------------------\n";
+    std::cout << "\n----------------------------------------\n";
         for (size_t i = 0; i < m_twiddles.size(); i++)
             std::cout << "twiddle[" << i << "] = " << m_twiddles.at(i) << "\n";
-        std::cout << "\n----------------------------------------\n";*/
+        std::cout << "\n----------------------------------------\n";
 }
 
 void MyFFT::reduce_noise () {

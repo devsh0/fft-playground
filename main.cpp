@@ -11,7 +11,7 @@ bool is_close (const fftout_t& out1, const fftout_t& out2, double tolerance) {
         return false;
     }
 
-    bool okay = true;
+    size_t errors = 0;
     for (size_t i = 0; i < out1.size (); i++) {
         auto out1_real = out1[i].real ();
         auto out1_imag = out1[i].imag ();
@@ -23,16 +23,17 @@ bool is_close (const fftout_t& out1, const fftout_t& out2, double tolerance) {
         auto imag_diff = fabs (out1_imag - out2_imag);
 
         if (real_diff > tolerance) {
-            std::cout << "Index: " << i << ", Tolerance: " << tolerance << ", real_diff: " << real_diff << "\n";
-            okay = false;
+            //std::cout << "Index: " << i << ", Tolerance: " << tolerance << ", real_diff: " << real_diff << "\n";
+            errors++;
         }
         if (imag_diff > tolerance) {
-            std::cout << "Index: " << i << ", Tolerance: " << tolerance << ", imag_diff: " << imag_diff << "\n";
-            okay = false;
+            //std::cout << "Index: " << i << ", Tolerance: " << tolerance << ", imag_diff: " << imag_diff << "\n";
+            errors++;
         }
     }
 
-    return okay;
+    std::cout << "Errors: " << errors << "\n";
+    return errors == 0;
 }
 
 void dump_fftout_side_by_side (const fftout_t& out1, const fftout_t& out2) {
@@ -45,16 +46,22 @@ void dump_fftout_side_by_side (const fftout_t& out1, const fftout_t& out2) {
 }
 
 int main () {
-    for (size_t i = 1; i < 4; i++) {
+    size_t start = 3;
+    size_t steps = 1;
+    size_t stop = start + steps;
+
+    for (size_t i = start; i < stop; i++) {
         size_t size = 2u << i;
         //std::cout << "Size: " << size << "\n";
         const std::vector<double> samples = generate (size);
+
         MyFFT myfft;
         FFTW fftw;
 
         auto out1 = myfft.transform (samples);
         auto out2 = fftw.transform (samples);
         double tolerance = 0.0001;
+        dump_fftout_side_by_side (out1, out2);
 
         bool close = is_close (out1, out2, tolerance);
         if (close)
@@ -63,6 +70,5 @@ int main () {
             std::cout << "Size: " << size << " -- FFTs Don't Match :(\n";
         //dump_fftout_side_by_side (out1, out2);
     }
-
     return 0;
 }

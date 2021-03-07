@@ -1,5 +1,6 @@
 #include "fftw.h"
 #include <fftw3.h>
+#include <iostream>
 
 std::vector<std::complex<double> > FFTW::transform(const std::vector<double>& samples)
 {
@@ -16,7 +17,6 @@ std::vector<std::complex<double> > FFTW::transform(const std::vector<double>& sa
     }
 
     fftw_execute(plan);
-
     std::vector<std::complex<double>> output;
     output.reserve(size);
     for (size_t i = 0; i < size; i++) {
