@@ -11,54 +11,57 @@ using u32 = unsigned int;
 #define PI 3.14159265
 
 size_t MyFFT::get_complement (size_t number, size_t width) {
-    // Unpack bits
-    std::vector<u8> bits;
-    bits.reserve (width);
-    for (size_t i = 0; i < width; i++)
-        bits.push_back ((number & (1u << i)) > 0);
+   size_t complement = 0;
+   u8 rstart = width - 1;
+   u8 lstart = 0;
+   for (int i = 0; i < width; i++)
+   {
+       // test number's bit at rstart
+       // set complement's lstart bit to the tested bit
+       u8 bit = ((1u << rstart) & number) > 0u;
+       complement |= bit << lstart;
+       rstart--;
+       lstart++;
+   }
 
-    // Reverse bits
-    for (size_t i = 0, j = width - 1; i < j; i++, j--) {
-        u8 tmp = bits.at (i);
-        bits[i] = bits[j];
-        bits[j] = tmp;
-    }
+    /*std::bitset<4> ibits (number);
+    std::bitset<4> cbits (complement);
+    std::cout << ibits << "(" << number << ")" <<  ", " << cbits << "(" << complement << ")" << "\n";*/
 
-    // Compute "complement"
-    size_t accum = 0;
-    for (int i = 0; i < width; i++)
-        accum += bits[i] * (pow (2, i));
-    return accum;
+   return complement;
 }
 
 void MyFFT::bit_reversal (std::vector<double>& samples) {
     // TODO: check if sample vector size is a power of 2.
     int size = samples.size ();
-    std::cout << "Bit reversal---------------------------------\n";
-    //m_bit_reverse_index.reserve(size);
+    //std::cout << "Bit reversal---------------------------------\n";
+    m_bit_reverse_index.reserve(size);
     int bit_space = (int) log2 (size);
-    for (int i = 0; i < size / 2; i++) {
-        int complement_i = get_complement (i, bit_space);
+    for (int i = 0; i < size; i++) {
+        unsigned complement_i = get_complement (i, bit_space);
+        m_bit_reverse_index.emplace_back(complement_i);
+    }
 
+    for (size_t i = 0; i < size; i++)
+    {
+        size_t complement = m_bit_reverse_index[i];
+        if (complement > i) {
+            double tmp = samples[i];
+            samples[i] = samples[complement];
+            samples[complement] = tmp;
+        }
+    }
+
+    /*for (int i = 0; i < size; i++)
+    {
+        unsigned complement_i = m_bit_reverse_index[i];
         std::bitset<4> ibits (i);
         std::bitset<4> cbits (complement_i);
 
         std::cout << ibits << "(" << i << ")" <<  ", " << cbits << "(" << complement_i << ")" << "\n";
-        
-        auto tmp = samples[i];
-        samples[i] = samples[complement_i];
-        samples[complement_i] = tmp;
-        //m_bit_reverse_index.emplace_back(complement_i);
-    }
-
-    std::cout << "---------------------------------\n";
-
-    /*for (size_t i = 0; i < size; i++)
-    {
-        double tmp = samples[i];
-        samples[i] = samples[m_bit_reverse_index[i]];
-        samples[m_bit_reverse_index[i]] = tmp;
     }*/
+
+    //std::cout << "---------------------------------\n";
 }
 
 std::complex<double> MyFFT::twiddle (size_t fft_size, size_t k) {
@@ -106,10 +109,10 @@ void MyFFT::compute_twiddles (size_t fft_size) {
         }
     }
 
-    std::cout << "\n----------------------------------------\n";
+    /*std::cout << "\n----------------------------------------\n";
         for (size_t i = 0; i < m_twiddles.size(); i++)
             std::cout << "twiddle[" << i << "] = " << m_twiddles.at(i) << "\n";
-        std::cout << "\n----------------------------------------\n";
+        std::cout << "\n----------------------------------------\n";*/
 }
 
 void MyFFT::reduce_noise () {

@@ -23,11 +23,11 @@ bool is_close (const fftout_t& out1, const fftout_t& out2, double tolerance) {
         auto imag_diff = fabs (out1_imag - out2_imag);
 
         if (real_diff > tolerance) {
-            //std::cout << "Index: " << i << ", Tolerance: " << tolerance << ", real_diff: " << real_diff << "\n";
+            std::cout << "Index: " << i << ", Tolerance: " << tolerance << ", real_diff: " << real_diff << "\n";
             errors++;
         }
         if (imag_diff > tolerance) {
-            //std::cout << "Index: " << i << ", Tolerance: " << tolerance << ", imag_diff: " << imag_diff << "\n";
+            std::cout << "Index: " << i << ", Tolerance: " << tolerance << ", imag_diff: " << imag_diff << "\n";
             errors++;
         }
     }
@@ -46,8 +46,8 @@ void dump_fftout_side_by_side (const fftout_t& out1, const fftout_t& out2) {
 }
 
 int main () {
-    size_t start = 3;
-    size_t steps = 1;
+    size_t start = 1;
+    size_t steps = 17;
     size_t stop = start + steps;
 
     for (size_t i = start; i < stop; i++) {
@@ -60,8 +60,8 @@ int main () {
 
         auto out1 = myfft.transform (samples);
         auto out2 = fftw.transform (samples);
-        double tolerance = 0.0001;
-        dump_fftout_side_by_side (out1, out2);
+        double tolerance = 0.005;
+        //dump_fftout_side_by_side (out1, out2);
 
         bool close = is_close (out1, out2, tolerance);
         if (close)
