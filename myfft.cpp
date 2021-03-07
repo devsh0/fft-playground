@@ -71,6 +71,33 @@ void MyFFT::fft (std::vector<std::complex<double>>& samples, size_t start, size_
     synth (samples, start, end);
 }
 
+void MyFFT::fft_iter (std::vector<std::complex<double>>& samples)
+{
+    size_t size = samples.size();
+    auto total_stages = (unsigned)log2(size);
+    for (unsigned stage = 0; stage < total_stages; stage++)
+    {
+        size_t fft_size = 2u << stage;
+        unsigned fft_count = size / fft_size;
+        size_t si = 0;
+        for (unsigned i = 0; i < fft_count; i++)
+        {
+            size_t ops = fft_size / 2;
+            for (size_t m = 0; m < ops; m++)
+            {
+                auto twid = twiddle(fft_size, m);
+                auto rhs = twid * samples[si + (fft_size / 2)];
+                auto out1 = samples[si] + rhs;
+                auto out2 = samples[si] - rhs;
+                samples[si] = out1;
+                samples[si + (fft_size / 2)] = out2;;
+                si++;
+            }
+            si += fft_size / 2;
+        }
+    }
+}
+
 void MyFFT::compute_twiddles (size_t fft_size) {
     size_t size = -(1 - pow (2, log2 (fft_size)));
     m_twiddles.reserve (size);
@@ -91,6 +118,7 @@ std::vector<std::complex<double>> MyFFT::transform (const std::vector<double>& s
     m_samples.reserve (samples.size ());
     for (double sample : samples_copy)
         m_samples.emplace_back (sample, 0);
-    fft (m_samples, 0, samples.size () - 1);
+    //fft (m_samples, 0, samples.size () - 1);
+    fft_iter(m_samples);
     return m_samples;
 }

@@ -49,7 +49,7 @@ void dump_fftout_side_by_side (const fftout_t& out1, const fftout_t& out2) {
 void test_fft ()
 {
     size_t start = 1;
-    size_t steps = 15;
+    size_t steps = 16;
     size_t stop = start + steps;
 
     for (size_t i = start; i < stop; i++) {
@@ -72,7 +72,21 @@ void test_fft ()
     }
 }
 
-int main () {
+
+void bench ()
+{
+    std::cout << "----------------- Bench -----------------\n";
+    int degree = 18;
+    size_t size = pow(2, degree);
+    std::cout << "Size: " << size << "\n";
+    const std::vector<double> samples = generate(size);
+    MyFFT myfft;
+    auto output = myfft.transform(samples);
+    std::cout << "-----------------------------------------\n";
+}
+
+void test ()
+{
     int tests = 10;
     for (int i = 0; i < tests; i++)
     {
@@ -80,6 +94,10 @@ int main () {
         test_fft();
         std::cout << "------------------------------------------\n";
     }
+}
 
+int main () {
+    test();
+    //bench();
     return 0;
 }

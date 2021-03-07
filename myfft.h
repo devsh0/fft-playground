@@ -16,6 +16,7 @@ public:
     std::complex<double> twiddle (size_t fft_size, size_t k);
     void synth (std::vector<std::complex<double>>& samples, size_t start, size_t end);
     void fft (std::vector<std::complex<double>>& samples, size_t start, size_t end);
+    void fft_iter (std::vector<std::complex<double>>& samples);
     void compute_twiddles (size_t fft_size);
     std::vector<std::complex<double>> transform (const std::vector<double>& samples);
 };
