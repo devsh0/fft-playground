@@ -8,7 +8,7 @@ class MyFFT
 private:
     std::vector<std::complex<double>> m_twiddles;
     std::vector<std::complex<double>> m_samples;
-    std::vector<size_t> m_bit_reverse_index;
+    std::vector<size_t> m_bit_reverse_table;
 
 public:
     size_t get_complement (size_t number, size_t width);
@@ -17,6 +17,5 @@ public:
     void synth (std::vector<std::complex<double>>& samples, size_t start, size_t end);
     void fft (std::vector<std::complex<double>>& samples, size_t start, size_t end);
     void compute_twiddles (size_t fft_size);
-    void reduce_noise ();
     std::vector<std::complex<double>> transform (const std::vector<double>& samples);
 };
