@@ -60,7 +60,7 @@ void MyFFT::synth (std::vector<std::complex<double>>& samples, size_t start, siz
 }
 
 void MyFFT::fft (std::vector<std::complex<double>>& samples, size_t start, size_t end) {
-    size_t mid = (start + end) / 2;
+    size_t mid = start + (end - start) / 2;
     size_t fft_size = (end - start) + 1;
     if (fft_size == 2) {
         synth (samples, start, end);
