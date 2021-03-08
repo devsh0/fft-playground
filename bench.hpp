@@ -1,17 +1,21 @@
-#include <iostream>
-#include <cmath>
-#include <vector>
-#include "signalgen.h"
+#include "fftw.h"
+#include "fftw3.h"
 #include "myfft.h"
+#include "signalgen.h"
+#include <cmath>
+#include <iostream>
+#include <vector>
+
+#define FFTOOL MyFFT
 
 void bench ()
 {
     std::cout << "----------------- Bench -----------------\n";
-    int degree = 18;
+    int degree = 11;
     size_t size = pow(2, degree);
     std::cout << "Size: " << size << "\n";
     const std::vector<double> samples = generate(size);
-    MyFFT myfft;
-    auto output = myfft.transform(samples);
+    FFTOOL fft;
+    auto output = fft.transform(samples);
     std::cout << "-----------------------------------------\n";
 }
