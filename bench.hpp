@@ -11,7 +11,7 @@
 void bench ()
 {
     std::cout << "----------------- Bench -----------------\n";
-    int degree = 11;
+    int degree = 15;
     size_t size = pow(2, degree);
     std::cout << "Size: " << size << "\n";
     const std::vector<double> samples = generate(size);

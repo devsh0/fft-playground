@@ -22,7 +22,7 @@ size_t MyFFT::get_complement (size_t number, size_t width) {
    return complement;
 }
 
-void MyFFT::bit_reversal (std::vector<double>& samples) {
+void MyFFT::bit_reversal (std::vector<std::complex<double>>& samples) {
     // TODO: check if sample vector size is a power of 2.
     int size = samples.size ();
     m_bit_reverse_table.reserve(size);
@@ -36,7 +36,7 @@ void MyFFT::bit_reversal (std::vector<double>& samples) {
     {
         size_t complement = m_bit_reverse_table[i];
         if (complement > i) {
-            double tmp = samples[i];
+            auto tmp = samples[i];
             samples[i] = samples[complement];
             samples[complement] = tmp;
         }
@@ -44,18 +44,19 @@ void MyFFT::bit_reversal (std::vector<double>& samples) {
 }
 
 std::complex<double> MyFFT::twiddle (size_t fft_size, size_t k) {
-    size_t segment = -(1 - pow (2, log2 (fft_size / 2)));
+    size_t segment = (fft_size >> 1u) - 1 ;
     return m_twiddles[segment + k];
 }
 
 void MyFFT::synth (std::vector<std::complex<double>>& samples, size_t start, size_t end) {
     size_t fft_size = (end - start) + 1;
-    for (size_t k = 0, m = start; k < fft_size / 2; k++, m++) {
-        auto rhs = twiddle (fft_size, k) * samples[m + (fft_size / 2)];
+    size_t half_size = fft_size >> 1u;
+    for (size_t k = 0, m = start; k < half_size; k++, m++) {
+        auto rhs = twiddle (fft_size, k) * samples[m + half_size];
         auto out1 = samples[m] + rhs;
         auto out2 = samples[m] - rhs;
         samples[m] = out1;
-        samples[m + (fft_size / 2)] = out2;
+        samples[m + half_size] = out2;
     }
 }
 
@@ -99,8 +100,8 @@ void MyFFT::fft_iter (std::vector<std::complex<double>>& samples)
 }
 
 void MyFFT::compute_twiddles (size_t fft_size) {
-    size_t size = -(1 - pow (2, log2 (fft_size)));
-    m_twiddles.reserve (size);
+    size_t twiddle_count = fft_size - 1;
+    m_twiddles.reserve (twiddle_count);
     m_twiddles.emplace_back (1, 0);
     for (size_t m = 4; m <= fft_size; m *= 2) {
         for (size_t i = 0; i < m / 2; i++) {
@@ -113,12 +114,11 @@ void MyFFT::compute_twiddles (size_t fft_size) {
 
 std::vector<std::complex<double>> MyFFT::transform (const std::vector<double>& samples) {
     compute_twiddles (samples.size ());
-    std::vector<double> samples_copy {samples};
-    bit_reversal (samples_copy);
     m_samples.reserve (samples.size ());
-    for (double sample : samples_copy)
+    for (double sample : samples)
         m_samples.emplace_back (sample, 0);
-    //fft (m_samples, 0, samples.size () - 1);
-    fft_iter(m_samples);
+    bit_reversal (m_samples);
+    fft (m_samples, 0, samples.size () - 1);
+    //fft_iter(m_samples);
     return m_samples;
 }

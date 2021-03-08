@@ -12,7 +12,7 @@ private:
 
 public:
     size_t get_complement (size_t number, size_t width);
-    void bit_reversal (std::vector<double>& samples);
+    void bit_reversal (std::vector<std::complex<double>>& samples);
     std::complex<double> twiddle (size_t fft_size, size_t k);
     void synth (std::vector<std::complex<double>>& samples, size_t start, size_t end);
     void fft (std::vector<std::complex<double>>& samples, size_t start, size_t end);
