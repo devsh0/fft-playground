@@ -2,7 +2,7 @@
 #include <fftw3.h>
 #include <iostream>
 
-std::vector<std::complex<double> > FFTW::transform(const std::vector<double>& samples)
+std::vector<std::complex<double> > FFTW::forward_transform (const std::vector<double>& samples)
 {
     size_t size = samples.size();
     fftw_complex *in, *out;

@@ -73,8 +73,8 @@ void test0 () {
             MyFFT myfft;
             FFTW fftw;
 
-            auto out1 = myfft.transform (samples);
-            auto out2 = fftw.transform (samples);
+            auto out1 = myfft.forward_transform (samples);
+            auto out2 = fftw.forward_transform (samples);
 
             bool close = is_close (out1, out2);
             if (close) {
@@ -105,7 +105,7 @@ void test1 () {
     auto samples = fetch_from_file ("../sample/testcase1.sam");
     auto size = samples.size ();
     MyFFT myfft;
-    auto fdomain = myfft.transform (samples);
+    auto fdomain = myfft.forward_transform (samples);
 
     // Peak amplitude at m = 4 and m = size-4.
     double abs_expect_real = 0;
@@ -151,7 +151,7 @@ void test2 () {
     auto samples = fetch_from_file ("../sample/testcase2.sam");
     auto size = samples.size ();
     MyFFT myfft;
-    auto fdomain = myfft.transform (samples);
+    auto fdomain = myfft.forward_transform (samples);
 
     // Amplitude spike at m = [4, 8, 124, 122]
     double abs_expect_real_at_4 = 0;
@@ -177,7 +177,6 @@ void test2 () {
                 }
 #endif
                 break;
-
             case 8:
             case 120:
                 success = (abs_real - abs_expect_real_at_8) < g_tolerance && (abs_imag - abs_expect_imag_at_8) < g_tolerance;
@@ -188,7 +187,6 @@ void test2 () {
                 }
 #endif
                 break;
-
             default:
                 success = abs_real < g_tolerance && abs_imag < g_tolerance;
 #if VERBOSE
@@ -216,8 +214,8 @@ void test3 () {
     auto samples = fetch_from_file ("../sample/testcase1.sam");
     MyFFT myfft;
     FFTW fftw;
-    auto out1 = myfft.transform (samples);
-    auto out2 = fftw.transform (samples);
+    auto out1 = myfft.forward_transform (samples);
+    auto out2 = fftw.forward_transform (samples);
     bool close = is_close (out1, out2);
     if (close)
         std::cout << "Test3 succeeded :)\n";
@@ -225,9 +223,30 @@ void test3 () {
         std::cout << "Test3 failed :(\n";
 }
 
+void test_ifft ()
+{
+    unsigned degree = 15;
+    size_t size = 2u << degree;
+    MyFFT myfft;
+    auto samples = generate(size);
+    auto fdomain = myfft.forward_transform (samples);
+    auto tdomain = myfft.inverse_transform(fdomain);
+    double maxnoise = 0;
+    for (size_t i = 0; i < size; i++) {
+        double noise = fabs (fabs (samples[i]) - fabs (tdomain[i]));
+        if (noise > maxnoise)
+            maxnoise = noise;
+    }
+    bool success = maxnoise < 2e-12;
+    if (success)
+        std::cout << "IFFT test succeeded :)\n";
+    else std::cout << "IFFT test failed :(\n";
+}
+
 void test () {
     test0 ();
     test1 ();
     test2 ();
     test3 ();
+    test_ifft();
 }

@@ -11,11 +11,11 @@
 void bench ()
 {
     std::cout << "----------------- Bench -----------------\n";
-    int degree = 15;
+    int degree = 16;
     size_t size = pow(2, degree);
     std::cout << "Size: " << size << "\n";
     const std::vector<double> samples = generate(size);
     FFTOOL fft;
-    auto output = fft.transform(samples);
+    auto output = fft.forward_transform (samples);
     std::cout << "-----------------------------------------\n";
 }

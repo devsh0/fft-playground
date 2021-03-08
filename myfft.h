@@ -18,5 +18,7 @@ public:
     void fft (std::vector<std::complex<double>>& samples, size_t start, size_t end);
     void fft_iter (std::vector<std::complex<double>>& samples);
     void compute_twiddles (size_t fft_size);
-    std::vector<std::complex<double>> transform (const std::vector<double>& samples);
+    std::vector<std::complex<double>> forward_transform (const std::vector<double>& samples);
+
+    std::vector<double> inverse_transform (const std::vector<std::complex<double>>& samples);
 };

@@ -112,7 +112,7 @@ void MyFFT::compute_twiddles (size_t fft_size) {
     }
 }
 
-std::vector<std::complex<double>> MyFFT::transform (const std::vector<double>& samples) {
+std::vector<std::complex<double>> MyFFT::forward_transform (const std::vector<double>& samples) {
     compute_twiddles (samples.size ());
     m_samples.reserve (samples.size ());
     for (double sample : samples)
@@ -121,4 +121,21 @@ std::vector<std::complex<double>> MyFFT::transform (const std::vector<double>& s
     fft (m_samples, 0, samples.size () - 1);
     //fft_iter(m_samples);
     return m_samples;
+}
+
+std::vector<double> MyFFT::inverse_transform (const std::vector<std::complex<double>>& samples) {
+    auto size = samples.size();
+    if (m_twiddles.empty())
+        compute_twiddles(samples.size());
+    m_samples.reserve(samples.size());
+    m_samples.clear();
+    for (auto sample : samples)
+        m_samples.push_back(conj(sample));
+    bit_reversal(m_samples);
+    fft(m_samples, 0, samples.size() - 1);
+    std::vector<double> output;
+    output.reserve(samples.size());
+    for (auto sample : m_samples)
+        output.push_back(conj(sample).real() / size);
+    return output;
 }
