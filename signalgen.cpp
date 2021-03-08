@@ -2,6 +2,8 @@
 #include "signalgen.h"
 #include <iostream>
 #include <cmath>
+#include <sstream>
+#include <fstream>
 
 static bool seeded = false;
 
@@ -46,5 +48,28 @@ std::vector<double> generate (size_t size)
         seeded = true;
     }
     auto samples = generate_samples(size);
+    return samples;
+}
+
+std::vector<double> fetch_from_file (std::string file_name)
+{
+    std::ifstream stream;
+    stream.open(file_name);
+    if (!stream.is_open()) {
+        std::cerr << "Could't open file!\n";
+        return {};
+    }
+
+    std::vector<double> samples;
+    std::string line;
+    while (std::getline(stream, line))
+    {
+        std::istringstream iss(line);
+        double num;
+        if (!(iss >> num)) break;
+        samples.push_back(num);
+    }
+
+    stream.close();
     return samples;
 }

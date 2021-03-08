@@ -1,0 +1,1 @@
+testcase1: Contains 128 samples of a sine wave sampled at 512Hz, phase diff 0 and frequency 16Hz.

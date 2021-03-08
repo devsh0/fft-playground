@@ -4,5 +4,5 @@ project(fft)
 set(CMAKE_CXX_FLAGS -O2)
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(fft main.cpp myfft.cpp fftw.cpp signalgen.cpp)
+add_executable(fft main.cpp myfft.cpp fftw.cpp signalgen.cpp test.hpp bench.hpp)
 target_link_libraries(fft -lfftw3 -lm)
