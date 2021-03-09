@@ -1,6 +1,5 @@
 #include "myfft.h"
 #include <cmath>
-#include <complex>
 #include <vector>
 
 using u8 = unsigned char;
@@ -22,7 +21,7 @@ size_t MyFFT::get_complement (size_t number, size_t width) {
    return complement;
 }
 
-void MyFFT::bit_reversal (std::vector<std::complex<double>>& samples) {
+void MyFFT::bit_reversal (std::vector<MyComplex<double>>& samples) {
     // TODO: check if sample vector size is a power of 2.
     int size = samples.size ();
 
@@ -46,12 +45,12 @@ void MyFFT::bit_reversal (std::vector<std::complex<double>>& samples) {
     }
 }
 
-std::complex<double> MyFFT::twiddle (size_t fft_size, size_t k) {
+MyComplex<double> MyFFT::twiddle (size_t fft_size, size_t k) {
     size_t segment = (fft_size >> 1u) - 1 ;
     return m_twiddles[segment + k];
 }
 
-void MyFFT::synth (std::vector<std::complex<double>>& samples, size_t start, size_t end) {
+void MyFFT::synth (std::vector<MyComplex<double>>& samples, size_t start, size_t end) {
     size_t fft_size = (end - start) + 1;
     size_t half_size = fft_size >> 1u;
     for (size_t k = 0, m = start; k < half_size; k++, m++) {
@@ -63,7 +62,7 @@ void MyFFT::synth (std::vector<std::complex<double>>& samples, size_t start, siz
     }
 }
 
-void MyFFT::fft (std::vector<std::complex<double>>& samples, size_t start, size_t end) {
+void MyFFT::fft (std::vector<MyComplex<double>>& samples, size_t start, size_t end) {
     size_t mid = start + (end - start) / 2;
     size_t fft_size = (end - start) + 1;
     if (fft_size == 2) {
@@ -75,7 +74,7 @@ void MyFFT::fft (std::vector<std::complex<double>>& samples, size_t start, size_
     synth (samples, start, end);
 }
 
-void MyFFT::fft_iter (std::vector<std::complex<double>>& samples)
+void MyFFT::fft_iter (std::vector<MyComplex<double>>& samples)
 {
     size_t size = samples.size();
     auto total_stages = (unsigned)log2(size);
@@ -108,14 +107,14 @@ void MyFFT::compute_twiddles (size_t fft_size) {
     m_twiddles.emplace_back (1, 0);
     for (size_t m = 4; m <= fft_size; m *= 2) {
         for (size_t i = 0; i < m / 2; i++) {
-            std::complex<double> exponent = {0, (-2 * PI * i) / m};
-            auto tmp = exp (exponent);
+            MyComplex<double> exponent = {0, (-2 * PI * i) / m};
+            auto tmp = exponent.exp();
             m_twiddles.emplace_back (tmp);
         }
     }
 }
 
-std::vector<std::complex<double>> MyFFT::forward_transform (const std::vector<double>& samples) {
+std::vector<MyComplex<double>> MyFFT::forward_transform (const std::vector<double>& samples) {
     compute_twiddles (samples.size ());
     m_samples.reserve (samples.size ());
     for (double sample : samples)
@@ -126,19 +125,19 @@ std::vector<std::complex<double>> MyFFT::forward_transform (const std::vector<do
     return m_samples;
 }
 
-std::vector<double> MyFFT::inverse_transform (const std::vector<std::complex<double>>& samples) {
+std::vector<double> MyFFT::inverse_transform (const std::vector<MyComplex<double>>& samples) {
     auto size = samples.size();
     if (m_twiddles.empty())
         compute_twiddles(samples.size());
     m_samples.reserve(samples.size());
     m_samples.clear();
     for (auto sample : samples)
-        m_samples.push_back(conj(sample));
+        m_samples.push_back(sample.conjugate());
     bit_reversal(m_samples);
     fft(m_samples, 0, samples.size() - 1);
     std::vector<double> output;
     output.reserve(samples.size());
     for (auto sample : m_samples)
-        output.push_back(conj(sample).real() / size);
+        output.push_back((sample.conjugate()).real() / size);
     return output;
 }

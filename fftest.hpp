@@ -1,23 +1,22 @@
 #include "fftw.h"
 #include "myfft.h"
 #include "signalgen.h"
-#include <complex>
 #include <iostream>
 #include <vector>
 
 #define VERBOSE 0
 
-using fftout_t = std::vector<std::complex<double>>;
+using fftout_t = std::vector<MyComplex<double>>;
 
 // Tolerance is introduced to compensate for noise due to floating-point math.
 static constexpr double g_tolerance = 0.005;
 
-void dump_fftout (const fftout_t& out) {
+/*void dump_fftout (const fftout_t& out) {
     for (size_t i = 0; i < out.size (); i++)
         std::cout << i + 1 << ": " << out[i] << "\n";
-}
+}*/
 
-bool is_close (const fftout_t& out1, const fftout_t& out2) {
+bool is_close (const fftout_t& out1, const std::vector<std::complex<double>>& out2) {
     if (out1.size () != out2.size ()) {
         std::cout << "Varying sizes: "
                   << "out1: " << out1.size () << ", out2: " << out2.size () << "\n";

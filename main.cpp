@@ -4,7 +4,7 @@
 
 int main () {
     //test_cplx();
-    //fft_test();
+    fft_test();
     //bench();
     return 0;
 }
