@@ -1,8 +1,10 @@
 #include "bench.hpp"
-#include "test.hpp"
+#include "fftest.hpp"
+#include "cplxtest.hpp"
 
 int main () {
-    test ();
+    //test_cplx();
+    //fft_test();
     //bench();
     return 0;
 }

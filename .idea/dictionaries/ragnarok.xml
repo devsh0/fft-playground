@@ -2,12 +2,25 @@
   <dictionary name="ragnarok">
     <words>
       <w>bitpair</w>
+      <w>conju</w>
+      <w>cplx</w>
+      <w>cplxtest</w>
+      <w>denom</w>
+      <w>exped</w>
+      <w>fftest</w>
       <w>fftout</w>
       <w>fftw</w>
       <w>lbit</w>
+      <w>lstart</w>
+      <w>mycomplex</w>
       <w>myfft</w>
+      <w>nonnum</w>
+      <w>nume</w>
       <w>rbit</w>
+      <w>rstart</w>
+      <w>signalgen</w>
       <w>synth</w>
+      <w>twid</w>
     </words>
   </dictionary>
 </component>

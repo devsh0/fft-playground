@@ -243,7 +243,7 @@ void test_ifft ()
     else std::cout << "IFFT test failed :(\n";
 }
 
-void test () {
+void fft_test () {
     test0 ();
     test1 ();
     test2 ();

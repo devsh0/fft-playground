@@ -200,7 +200,7 @@ void test_exp () {
     std::cout << "Exp test succeeded :)\n";
 }
 
-void test_cplx () {
+void complex_test () {
     test_initialization ();
     test_addition ();
     test_subtraction ();
