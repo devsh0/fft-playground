@@ -25,11 +25,14 @@ size_t MyFFT::get_complement (size_t number, size_t width) {
 void MyFFT::bit_reversal (std::vector<std::complex<double>>& samples) {
     // TODO: check if sample vector size is a power of 2.
     int size = samples.size ();
-    m_bit_reverse_table.reserve(size);
-    int bit_space = (int) log2 (size);
-    for (int i = 0; i < size; i++) {
-        unsigned complement_i = get_complement (i, bit_space);
-        m_bit_reverse_table.emplace_back(complement_i);
+
+    if (m_bit_reverse_table.empty()) {
+        m_bit_reverse_table.reserve (size);
+        int bit_space = (int) log2 (size);
+        for (int i = 0; i < size; i++) {
+            unsigned complement_i = get_complement (i, bit_space);
+            m_bit_reverse_table.emplace_back (complement_i);
+        }
     }
 
     for (size_t i = 0; i < size; i++)
